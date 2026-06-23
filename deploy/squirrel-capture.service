@@ -1,0 +1,17 @@
+[Unit]
+Description=Squirrel capture pipeline
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=pi
+WorkingDirectory=/opt/squirrel-capture
+ExecStart=/opt/squirrel-capture/venv/bin/python pipeline.py
+Restart=always
+RestartSec=10
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target
