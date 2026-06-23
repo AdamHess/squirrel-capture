@@ -54,3 +54,38 @@ nyc-backyard-v2:
     precision: 0.711
     recall: 0.704
   notes: 'v2: expanded OpenImages (3k images), yolo11m. Bird/Persons mAP weak.'
+nyc-backyard-v3:
+  type: prelabeled
+  date: '2026-06-23'
+  path: runs/detect/runs/nyc-backyard-v3/weights/best.pt
+  classes:
+  - Squirrel
+  - Bird
+  - Raccoon
+  - Cat
+  - Mouse
+  - Person
+  num_classes: 6
+  base_model: nyc-backyard-v2
+  dataset: openimages-v7 + caltech-camera-traps
+  num_images: 4743
+  metrics:
+    mAP50: 0.789
+    mAP50-95: 0.537
+    precision: 0.772
+    recall: 0.761
+  class_metrics:
+    Squirrel:
+      mAP50: 0.634
+    Bird:
+      mAP50: 0.359
+    Raccoon:
+      mAP50: 0.604
+    Cat:
+      mAP50: 0.8
+    Mouse:
+      mAP50: 0.548
+    Person:
+      mAP50: 0.277
+  notes: 'v3: balanced 4.7k images (OpenImages + Caltech), yolo11m fine-tune. +7.5
+    mAP vs v2.'
