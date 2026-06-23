@@ -1,8 +1,7 @@
-import time
 import logging
+import time
 
 import cv2
-import numpy as np
 
 log = logging.getLogger(__name__)
 
@@ -41,7 +40,7 @@ class MotionDetector:
 
         motion = False
 
-        if self.method == "mog2":
+        if self.method == "mog2" and self._bg_subtractor is not None:
             fg_mask = self._bg_subtractor.apply(frame)
             kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (5, 5))
             fg_mask = cv2.morphologyEx(fg_mask, cv2.MORPH_OPEN, kernel)
@@ -60,7 +59,8 @@ class MotionDetector:
                 return False
             diff = cv2.absdiff(self._prev_frame, gray)
             _, thresh = cv2.threshold(diff, self.threshold, 255, cv2.THRESH_BINARY)
-            thresh = cv2.dilate(thresh, None, iterations=2)
+            kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (3, 3))
+            thresh = cv2.dilate(thresh, kernel, iterations=2)
             contours, _ = cv2.findContours(thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
             for c in contours:
                 if cv2.contourArea(c) >= self.min_area:

@@ -5,13 +5,12 @@ import sys
 import time
 from pathlib import Path
 
-import cv2
 import yaml
 
-from capture.rtsp_stream import RTSPStream
 from capture.motion_detector import MotionDetector
-from detection.yolo_detector import YOLODetector
+from capture.rtsp_stream import RTSPStream
 from detection.tracker import DetectionTracker
+from detection.yolo_detector import YOLODetector
 from labeling.auto_labeler import AutoLabeler
 
 log = logging.getLogger("pipeline")
@@ -94,8 +93,7 @@ class SquirrelPipeline:
         self.stream.stop()
         stats = self.labeler.stats
         log.info(
-            "Pipeline stopped. Saved %d images (%d this hour). "
-            "Raw: %d, Labeled: %d.",
+            "Pipeline stopped. Saved %d images (%d this hour). Raw: %d, Labeled: %d.",
             stats["total_saved"],
             stats["hourly_count"],
             stats["raw_count"],
@@ -176,17 +174,11 @@ def setup_logging(verbose=False):
 
 
 def main():
-    parser = argparse.ArgumentParser(
-        description="Squirrel capture pipeline with auto-labeling"
-    )
+    parser = argparse.ArgumentParser(description="Squirrel capture pipeline with auto-labeling")
     parser.add_argument(
-        "-c", "--config", default="config.yaml",
-        help="Path to config file (default: config.yaml)"
+        "-c", "--config", default="config.yaml", help="Path to config file (default: config.yaml)"
     )
-    parser.add_argument(
-        "-v", "--verbose", action="store_true",
-        help="Enable debug logging"
-    )
+    parser.add_argument("-v", "--verbose", action="store_true", help="Enable debug logging")
     args = parser.parse_args()
 
     setup_logging(args.verbose)

@@ -1,8 +1,6 @@
 import logging
 from collections import OrderedDict
 
-import numpy as np
-
 log = logging.getLogger(__name__)
 
 

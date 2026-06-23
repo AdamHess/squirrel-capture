@@ -7,6 +7,7 @@ Export labeled dataset for training:
 Usage:
   python training/export_dataset.py --input data/labeled --output data/exports/my_export
 """
+
 import argparse
 import logging
 import random
@@ -18,8 +19,7 @@ import yaml
 log = logging.getLogger("export")
 
 
-def export_dataset(input_dir, output_dir, split=(0.8, 0.2, 0.0),
-                   class_names=None):
+def export_dataset(input_dir, output_dir, split=(0.8, 0.2, 0.0), class_names=None):
     input_dir = Path(input_dir)
     output_dir = Path(output_dir)
     images_dir = input_dir / "images"
@@ -37,7 +37,7 @@ def export_dataset(input_dir, output_dir, split=(0.8, 0.2, 0.0),
     n_val = int(n * split[1])
 
     train_imgs = images[:n_train]
-    val_imgs = images[n_train:n_train + n_val]
+    val_imgs = images[n_train : n_train + n_val]
 
     for split_name, img_list in [("train", train_imgs), ("val", val_imgs)]:
         out_img_dir = output_dir / split_name / "images"

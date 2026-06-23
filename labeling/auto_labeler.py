@@ -1,18 +1,22 @@
-import os
-import time
 import logging
+import time
 from pathlib import Path
 
 import cv2
-import numpy as np
 
 log = logging.getLogger(__name__)
 
 
 class AutoLabeler:
-    def __init__(self, output_dir="data", label_format="yolo",
-                 save_raw=True, save_labeled=True,
-                 min_confidence=0.3, max_per_hour=120):
+    def __init__(
+        self,
+        output_dir="data",
+        label_format="yolo",
+        save_raw=True,
+        save_labeled=True,
+        min_confidence=0.3,
+        max_per_hour=120,
+    ):
         self.output_dir = Path(output_dir)
         self.label_format = label_format
         self.save_raw = save_raw
@@ -64,12 +68,20 @@ class AutoLabeler:
                 x1, y1, x2, y2 = d["bbox"]
                 label = f"{d['class_name']} {d['confidence']:.2f}"
                 cv2.rectangle(annotated, (x1, y1), (x2, y2), (0, 255, 0), 2)
-                cv2.putText(annotated, label, (x1, y1 - 5),
-                            cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
+                cv2.putText(
+                    annotated, label, (x1, y1 - 5), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2
+                )
                 if "track_id" in d:
                     tid_label = f"ID: {d['track_id']}"
-                    cv2.putText(annotated, tid_label, (x1, y2 + 15),
-                                cv2.FONT_HERSHEY_SIMPLEX, 0.4, (255, 255, 0), 1)
+                    cv2.putText(
+                        annotated,
+                        tid_label,
+                        (x1, y2 + 15),
+                        cv2.FONT_HERSHEY_SIMPLEX,
+                        0.4,
+                        (255, 255, 0),
+                        1,
+                    )
             anno_path = str(self.labeled_dir / "images" / f"{filename}_annotated.jpg")
             cv2.imwrite(anno_path, annotated)
 

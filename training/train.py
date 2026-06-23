@@ -7,6 +7,7 @@ Usage:
 Run this on your Windows desktop (GTX 2080) after syncing labeled data
 from the Linux server.
 """
+
 import argparse
 import logging
 from pathlib import Path
@@ -24,7 +25,8 @@ def create_data_yaml(label_dir, output_path, class_names=None):
     if not images_dir.exists() or not labels_dir.exists():
         log.error(
             "Expected %s and %s to exist",
-            images_dir, labels_dir,
+            images_dir,
+            labels_dir,
         )
         return False
 
@@ -34,6 +36,7 @@ def create_data_yaml(label_dir, output_path, class_names=None):
         return False
 
     import random
+
     random.shuffle(images)
     split = int(len(images) * 0.8)
 
@@ -54,23 +57,22 @@ def create_data_yaml(label_dir, output_path, class_names=None):
 
     for img in train_imgs:
         shutil.copy2(str(img), str(train_dir / img.name))
-        lbl = labels_dir / img.stem + ".txt"
+        lbl = labels_dir / f"{img.stem}.txt"
         if lbl.exists():
             shutil.copy2(str(lbl), str(train_lbl / lbl.name))
 
     for img in val_imgs:
         shutil.copy2(str(img), str(val_dir / img.name))
-        lbl = labels_dir / img.stem + ".txt"
+        lbl = labels_dir / f"{img.stem}.txt"
         if lbl.exists():
             shutil.copy2(str(lbl), str(val_lbl / lbl.name))
 
-    classes = sorted(
-        set()
-        for lbl_file in labels_dir.glob("*.txt"):
-            for line in lbl_file.read_text().strip().splitlines():
-                if line.strip():
-                    classes.add(int(line.split()[0]))
-    )
+    classes = set()
+    for lbl_file in labels_dir.glob("*.txt"):
+        for line in lbl_file.read_text().strip().splitlines():
+            if line.strip():
+                classes.add(int(line.split()[0]))
+    classes = sorted(classes)
 
     if class_names is None:
         class_names = {c: f"class_{c}" for c in classes}
@@ -85,17 +87,25 @@ def create_data_yaml(label_dir, output_path, class_names=None):
     }
 
     import yaml
+
     with open(output_path, "w") as f:
         yaml.dump(data, f, default_flow_style=False)
 
-    log.info("Created %s with %d train / %d val images", output_path, len(train_imgs), len(val_imgs))
+    log.info(
+        "Created %s with %d train / %d val images",
+        output_path,
+        len(train_imgs),
+        len(val_imgs),
+    )
     return True
 
 
 def main():
     parser = argparse.ArgumentParser(description="Train YOLO on squirrel data")
     parser.add_argument("--data", default="data/labeled", help="Path to labeled data directory")
-    parser.add_argument("--model", default="yolo11n.pt", help="Base model (yolo11n.pt, yolo11s.pt, etc.)")
+    parser.add_argument(
+        "--model", default="yolo11n.pt", help="Base model (yolo11n.pt, yolo11s.pt, etc)"
+    )
     parser.add_argument("--epochs", type=int, default=100, help="Number of epochs")
     parser.add_argument("--batch", type=int, default=16, help="Batch size")
     parser.add_argument("--imgsz", type=int, default=640, help="Image size")
@@ -122,7 +132,10 @@ def main():
 
     log.info(
         "Starting training: %d epochs, batch %d, imgsz %d, device %s",
-        args.epochs, args.batch, args.imgsz, args.device,
+        args.epochs,
+        args.batch,
+        args.imgsz,
+        args.device,
     )
 
     results = model.train(
@@ -143,7 +156,11 @@ def main():
         verbose=True,
     )
 
-    log.info("Training complete. Best model saved to %s/%s/weights/best.pt", args.project, args.name)
+    log.info(
+        "Training complete. Best model saved to %s/%s/weights/best.pt",
+        args.project,
+        args.name,
+    )
     log.info("Results: %s", results)
 
 

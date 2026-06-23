@@ -1,7 +1,6 @@
-import time
 import logging
-from threading import Thread, Event
 from queue import Queue
+from threading import Event, Thread
 
 import cv2
 
