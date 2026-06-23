@@ -1,0 +1,44 @@
+--- # Squirrel Capture Pipeline Config
+
+# Reolink camera
+camera:
+  rtsp_url: "rtsp://admin:password@192.168.1.100:554/Preview_01_main"
+  reconnect_interval: 5
+  timeout: 10
+
+# Motion detection
+motion:
+  enabled: true
+  method: "mog2"       # mog2, frame_diff, or none
+  min_area: 3000       # minimum contour area to trigger (pixels)
+  threshold: 25        # sensitivity (lower = more sensitive)
+  cooldown: 1.0        # seconds between motion triggers
+
+# Detection
+detection:
+  model: "yolo11n.pt"  # auto-downloaded; swap to best.pt after training
+  conf_threshold: 0.25
+  iou_threshold: 0.45
+  target_classes: [9]  # COCO class 9 = squirrel, [] = all
+  device: "cpu"        # "cpu", "cuda:0", etc.
+
+# Tracker (deduplicates labels per unique object)
+tracker:
+  enabled: true
+  method: "bytetrack"  # bytetrack or iou
+  max_lost: 30         # frames before track is forgotten
+  iou_threshold: 0.3
+
+# Capture / auto-label
+capture:
+  output_dir: "data"
+  label_format: "yolo" # yolo, coco, or voc
+  save_raw: true
+  save_labeled: true
+  min_confidence: 0.3  # minimum conf to auto-save label
+  max_images_per_hour: 120
+
+# Export (for sending to training machine)
+export:
+  split_ratio: [0.8, 0.2, 0.0]  # train, val, test
+  include_augmented: false

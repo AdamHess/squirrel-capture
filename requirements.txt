@@ -1,0 +1,14 @@
+# Inference (Linux server)
+ultralytics>=8.3.0
+opencv-python>=4.9.0
+numpy>=1.24.0
+pyyaml>=6.0
+Pillow>=10.0.0
+tqdm>=4.66.0
+
+# Training (Windows desktop, uncomment there)
+# torch>=2.0.0
+# torchvision>=0.15.0
+# ultralytics>=8.3.0
+# matplotlib>=3.7.0
+# tensorboard>=2.13.0
