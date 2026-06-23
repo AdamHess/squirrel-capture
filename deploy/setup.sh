@@ -17,8 +17,8 @@ sudo chown -R "$SERVICE_USER:$SERVICE_USER" "$INSTALL_DIR"
 
 # Create venv and install Python deps
 cd "$INSTALL_DIR"
-python3 -m venv venv
-source venv/bin/activate
+python3 -m venv .venv
+source .venv/bin/activate
 pip install --upgrade pip
 pip install -r requirements.txt
 

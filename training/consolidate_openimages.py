@@ -71,5 +71,5 @@ def consolidate(src_dir: str, out_dir: str, split=(0.8, 0.2), seed=42):
 if __name__ == "__main__":
     consolidate(
         src_dir="data/openimages",
-        out_dir="data/exports/nyc-backyard-v1",
+        out_dir="data/exports/nyc-backyard-v2",
     )

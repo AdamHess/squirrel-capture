@@ -38,7 +38,11 @@ capture:
   save_labeled: true
   save_annotated: false  # bounding-box previews (saves ~50% disk)
   min_confidence: 0.3  # minimum conf to auto-save label
-  max_images_per_hour: 120
+  track_cooldown: 3    # min seconds between saves of the same tracked object
+  quality:             # pre-save quality filters (0 = disabled)
+    min_blur: 50       # skip blurry frames (Laplacian variance, lower = blurrier)
+    min_box_area: 2000 # skip detections smaller than this many px
+    max_edge_margin: 10  # skip detections within N px of frame edge
 
 # Export (for sending to training machine)
 export:

@@ -50,7 +50,7 @@ motion:
   cooldown: 1.0
 
 detection:
-  model: "deploy/nyc-backyard-v1.pt"
+  model: "deploy/nyc-backyard-v2.pt"
   conf_threshold: 0.25
   iou_threshold: 0.45
   target_classes: [0]
@@ -69,7 +69,11 @@ capture:
   save_labeled: true
   save_annotated: false
   min_confidence: 0.3
-  max_images_per_hour: 120
+  track_cooldown: 3
+  quality:
+    min_blur: 50
+    min_box_area: 2000
+    max_edge_margin: 10
 
 export:
   split_ratio: [0.8, 0.2, 0.0]
@@ -81,13 +85,13 @@ python3 -c "import yaml; yaml.safe_load(open('config.yaml')); print('Config OK')
 
 echo "=== 5. Copying trained model weights ==="
 # After training on desktop, upload best.pt to deploy/:
-#   scp runs/detect/runs/nyc-backyard-v1/weights/best.pt user@server:/opt/squirrel-capture/deploy/nyc-backyard-v1.pt
+#   scp runs/detect/runs/nyc-backyard-v2/weights/best.pt root@192.168.1.251:/opt/squirrel-capture/deploy/nyc-backyard-v2.pt
 mkdir -p deploy
-if [ ! -f deploy/nyc-backyard-v1.pt ]; then
-    echo "WARNING: deploy/nyc-backyard-v1.pt not found. Download from GitHub releases or run:"
-    echo "  scp runs/detect/runs/nyc-backyard-v1/weights/best.pt <user>@<server>:/opt/squirrel-capture/deploy/nyc-backyard-v1.pt"
+if [ ! -f deploy/nyc-backyard-v2.pt ]; then
+    echo "WARNING: deploy/nyc-backyard-v2.pt not found. Download from GitHub releases or run:"
+    echo "  scp runs/detect/runs/nyc-backyard-v2/weights/best.pt root@192.168.1.251:/opt/squirrel-capture/deploy/nyc-backyard-v2.pt"
     echo "Falling back to yolo11n.pt for initial setup."
-    sed -i 's|deploy/nyc-backyard-v1.pt|yolo11n.pt|' config.yaml
+    sed -i 's|deploy/nyc-backyard-v2.pt|yolo11n.pt|' config.yaml
 fi
 
 echo "=== 6. Installing systemd service ==="

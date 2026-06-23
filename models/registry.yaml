@@ -33,3 +33,24 @@ nyc-backyard-v1:
       mAP50: 0.584
     Person:
       mAP50: 0.145
+nyc-backyard-v2:
+  type: prelabeled
+  date: '2026-06-23'
+  path: runs/detect/runs/nyc-backyard-v2-4/weights/best.pt
+  classes:
+  - Squirrel
+  - Bird
+  - Raccoon
+  - Cat
+  - Mouse
+  - Person
+  num_classes: 6
+  base_model: yolo11m.pt
+  dataset: openimages-v7
+  num_images: 3028
+  metrics:
+    mAP50: 0.714
+    mAP50-95: 0.497
+    precision: 0.711
+    recall: 0.704
+  notes: 'v2: expanded OpenImages (3k images), yolo11m. Bird/Persons mAP weak.'

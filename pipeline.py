@@ -31,6 +31,7 @@ class SquirrelPipeline:
             url=cam["rtsp_url"],
             reconnect_interval=cam.get("reconnect_interval", 5),
             timeout=cam.get("timeout", 10),
+            decode_every_n=cam.get("decode_every_n", 5),
         )
 
         mot = cfg["motion"]
@@ -69,8 +70,10 @@ class SquirrelPipeline:
             label_format=cap.get("label_format", "yolo"),
             save_raw=cap.get("save_raw", True),
             save_labeled=cap.get("save_labeled", True),
+            save_annotated=cap.get("save_annotated", False),
             min_confidence=cap.get("min_confidence", 0.3),
-            max_per_hour=cap.get("max_images_per_hour", 120),
+            track_cooldown=cap.get("track_cooldown", 10),
+            quality=cap.get("quality", None),
         )
 
     def start(self):
@@ -93,9 +96,8 @@ class SquirrelPipeline:
         self.stream.stop()
         stats = self.labeler.stats
         log.info(
-            "Pipeline stopped. Saved %d images (%d this hour). Raw: %d, Labeled: %d.",
+            "Pipeline stopped. Saved %d images. Raw: %d, Labeled: %d.",
             stats["total_saved"],
-            stats["hourly_count"],
             stats["raw_count"],
             stats["labeled_count"],
         )
@@ -119,12 +121,10 @@ class SquirrelPipeline:
             frame_count += 1
 
             if warmup:
-                if self.motion:
-                    self.motion.detect(frame)
+                # Drain initial frames to let the stream stabilize.
+                # MOG2 starts fresh on the first real detection frame below.
                 if frame_count >= warmup_frames:
                     warmup = False
-                    if self.motion:
-                        self.motion.reset()
                     log.info("Warmup complete")
                 continue
 
@@ -149,7 +149,7 @@ class SquirrelPipeline:
 
             if self._display_fps > 0 and frame_count % 30 == 0:
                 log.debug(
-                    "FPS: %d, detections: %d, saved: %d",
+                    "FPS: %d, detections: %d, total saved: %d",
                     self._display_fps,
                     len(detections),
                     self.labeler.stats["total_saved"],

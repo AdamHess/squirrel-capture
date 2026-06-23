@@ -171,6 +171,7 @@ def main():
         choices=["prelabeled", "finetuned"],
         help="prelabeled = trained on public data; finetuned = trained on custom capture data",
     )
+    parser.add_argument("--lr", type=float, default=None, help="Learning rate (default: auto)")
     parser.add_argument("--notes", default=None, help="Notes for the registry entry")
     parser.add_argument("--no-register", action="store_true", help="Skip model registry registration")
     args = parser.parse_args()
@@ -211,6 +212,7 @@ def main():
         batch=args.batch,
         imgsz=args.imgsz,
         device=args.device,
+        lr0=args.lr,
         project=args.project,
         name=args.name,
         patience=20,
