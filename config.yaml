@@ -2,9 +2,10 @@
 
 # Reolink camera
 camera:
-  rtsp_url: "rtsp://admin:password@192.168.1.100:554/Preview_01_main"
+  rtsp_url: "rtsp://admin:PeriodCake2024!@192.168.1.204:554/Preview_01_main"
   reconnect_interval: 5
   timeout: 10
+  decode_every_n: 5    # decode 1 out of every N frames (1 = decode all)
 
 # Motion detection
 motion:
@@ -16,11 +17,11 @@ motion:
 
 # Detection
 detection:
-  model: "yolo11n.pt"  # auto-downloaded; swap to best.pt after training
+  model: "nyc-backyard-v1"  # name in models/registry.yaml, or path to .pt
   conf_threshold: 0.25
   iou_threshold: 0.45
-  target_classes: [9]  # COCO class 9 = squirrel, [] = all
-  device: "cpu"        # "cpu", "cuda:0", etc.
+  target_classes: [0]       # [0] = Squirrel (our class 0), [] = all
+  device: "cpu"             # "cpu", "cuda:0", etc.
 
 # Tracker (deduplicates labels per unique object)
 tracker:
@@ -35,6 +36,7 @@ capture:
   label_format: "yolo" # yolo, coco, or voc
   save_raw: true
   save_labeled: true
+  save_annotated: false  # bounding-box previews (saves ~50% disk)
   min_confidence: 0.3  # minimum conf to auto-save label
   max_images_per_hour: 120
 

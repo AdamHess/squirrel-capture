@@ -40,6 +40,7 @@ camera:
   rtsp_url: "rtsp://admin:PeriodCake2024!@192.168.1.204:554/Preview_01_main"
   reconnect_interval: 5
   timeout: 10
+  decode_every_n: 5
 
 motion:
   enabled: true
@@ -49,10 +50,10 @@ motion:
   cooldown: 1.0
 
 detection:
-  model: "yolo11n.pt"
+  model: "deploy/nyc-backyard-v1.pt"
   conf_threshold: 0.25
   iou_threshold: 0.45
-  target_classes: [9]
+  target_classes: [0]
   device: "cuda:0"
 
 tracker:
@@ -66,6 +67,7 @@ capture:
   label_format: "yolo"
   save_raw: true
   save_labeled: true
+  save_annotated: false
   min_confidence: 0.3
   max_images_per_hour: 120
 
@@ -77,7 +79,18 @@ CONFIGEOF
 # Test the config won't break YAML parsing
 python3 -c "import yaml; yaml.safe_load(open('config.yaml')); print('Config OK')"
 
-echo "=== 5. Installing systemd service ==="
+echo "=== 5. Copying trained model weights ==="
+# After training on desktop, upload best.pt to deploy/:
+#   scp runs/detect/runs/nyc-backyard-v1/weights/best.pt user@server:/opt/squirrel-capture/deploy/nyc-backyard-v1.pt
+mkdir -p deploy
+if [ ! -f deploy/nyc-backyard-v1.pt ]; then
+    echo "WARNING: deploy/nyc-backyard-v1.pt not found. Download from GitHub releases or run:"
+    echo "  scp runs/detect/runs/nyc-backyard-v1/weights/best.pt <user>@<server>:/opt/squirrel-capture/deploy/nyc-backyard-v1.pt"
+    echo "Falling back to yolo11n.pt for initial setup."
+    sed -i 's|deploy/nyc-backyard-v1.pt|yolo11n.pt|' config.yaml
+fi
+
+echo "=== 6. Installing systemd service ==="
 # Determine the non-root user to run as (use the first regular user)
 SERVICE_USER=$(who am i | awk '{print $1}' || echo "root")
 if [ "$SERVICE_USER" = "root" ]; then
@@ -98,7 +111,7 @@ Wants=network-online.target
 Type=simple
 User=$SERVICE_USER
 WorkingDirectory=$INSTALL_DIR
-ExecStart=$INSTALL_DIR/venv/bin/python pipeline.py
+ExecStart=$INSTALL_DIR/.venv/bin/python pipeline.py
 Restart=always
 RestartSec=10
 StandardOutput=journal
@@ -111,7 +124,7 @@ SERVICEEOF
 systemctl daemon-reload
 systemctl enable squirrel-capture
 
-echo "=== 6. Starting pipeline ==="
+echo "=== 7. Starting pipeline ==="
 systemctl start squirrel-capture
 
 echo ""

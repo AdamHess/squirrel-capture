@@ -7,10 +7,16 @@ log = logging.getLogger(__name__)
 COCO_SQUIRREL_ID = 9
 
 
+def _resolve(path_or_name: str) -> str:
+    from models.registry import resolve_model_path
+
+    return resolve_model_path(path_or_name)
+
+
 class YOLODetector:
     def __init__(
         self,
-        model_path="yolo11n.pt",
+        model_path="nyc-backyard-v1",
         conf_threshold=0.25,
         iou_threshold=0.45,
         target_classes=None,
@@ -20,8 +26,9 @@ class YOLODetector:
         self.iou_threshold = iou_threshold
         self.target_classes = target_classes or []
         self.device = device
-        log.info("Loading model %s on %s ...", model_path, device)
-        self.model = YOLO(model_path)
+        resolved = _resolve(model_path)
+        log.info("Loading model %s (resolved: %s) on %s ...", model_path, resolved, device)
+        self.model = YOLO(resolved)
         log.info("Model loaded")
 
     def detect(self, frame):

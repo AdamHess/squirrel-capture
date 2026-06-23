@@ -1,0 +1,35 @@
+nyc-backyard-v1:
+  type: prelabeled
+  date: '2026-06-22'
+  path: runs/detect/runs/nyc-backyard-v1/weights/best.pt
+  classes:
+  - Squirrel
+  - Bird
+  - Raccoon
+  - Cat
+  - Mouse
+  - Person
+  num_classes: 6
+  base_model: yolo11s.pt
+  dataset: openimages-v7
+  num_images: 1435
+  notes: First multi-class baseline from OpenImages v7 boxable subset. Rat excluded
+    (not in boxable CSV).
+  metrics:
+    mAP50: 0.7
+    mAP50-95: 0.501
+    precision: 0.741
+    recall: 0.667
+  class_metrics:
+    Squirrel:
+      mAP50: 0.788
+    Bird:
+      mAP50: 0.257
+    Raccoon:
+      mAP50: 0.852
+    Cat:
+      mAP50: 0.595
+    Mouse:
+      mAP50: 0.584
+    Person:
+      mAP50: 0.145
