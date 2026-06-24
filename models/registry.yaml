@@ -119,3 +119,19 @@ squirrel-v7:
     mAP50: 0.543
     mAP50-95: 0.144
   notes: 'v7: trained on 35 hand-labeled frames only. Low confidence but precise.'
+squirrel-v8:
+  type: finetuned
+  date: '2026-06-24'
+  path: runs/detect/runs/squirrel-v8/weights/best.pt
+  classes:
+  - squirrel
+  num_classes: 1
+  base_model: yolo11s
+  dataset: 152 hand-labeled frames
+  num_images: 152
+  metrics:
+    mAP50: 0.949
+    mAP50-95: 0.509
+    precision: 0.804
+    recall: 0.968
+  notes: 'v8: trained on all hand-labeled frames. 100% at 0.25.'
