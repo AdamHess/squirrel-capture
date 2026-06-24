@@ -39,7 +39,7 @@ class DetectionTracker:
             best_id = None
             best_iou = 0
             for track_id, track in list(self._tracks.items()):
-                iou = self._bbox_iou(track["bbox"], det["bbox"])
+                iou = self._bbox_iou(track.bbox, det["bbox"])
                 if iou > best_iou and iou >= self.iou_threshold:
                     best_iou = iou
                     best_id = track_id
@@ -65,7 +65,7 @@ class DetectionTracker:
             best_id = None
             best_iou = 0
             for track_id, track in list(self._tracks.items()):
-                iou = self._bbox_iou(track["bbox"], det["bbox"])
+                iou = self._bbox_iou(track.bbox, det["bbox"])
                 if iou > best_iou:
                     best_iou = iou
                     best_id = track_id

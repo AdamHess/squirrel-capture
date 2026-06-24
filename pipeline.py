@@ -53,6 +53,8 @@ class SquirrelPipeline:
             target_classes=det.get("target_classes", []),
             device=det.get("device", "cpu"),
         )
+        self._sweep_every = det.get("yolo_sweep", 12)
+        self._sweep_counter = 0
 
         trk = cfg["tracker"]
         if trk.get("enabled", True):
@@ -134,7 +136,16 @@ class SquirrelPipeline:
             if self.motion:
                 motion_detected = self.motion.detect(frame)
 
-            if not motion_detected and self.motion is not None:
+            run_yolo = False
+            if motion_detected:
+                run_yolo = True
+            elif self._sweep_every > 0:
+                self._sweep_counter += 1
+                if self._sweep_counter >= self._sweep_every:
+                    self._sweep_counter = 0
+                    run_yolo = True
+
+            if not run_yolo:
                 continue
 
             detections = self.detector.detect(frame)

@@ -22,6 +22,7 @@ detection:
   iou_threshold: 0.45
   target_classes: [0]       # [0] = Squirrel (our class 0), [] = all
   device: "cpu"             # "cpu", "cuda:0", etc.
+  yolo_sweep: 12            # periodic YOLO every N frames (0=off, catches stationary)
 
 # Tracker (deduplicates labels per unique object)
 tracker:

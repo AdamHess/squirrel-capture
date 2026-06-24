@@ -89,3 +89,19 @@ nyc-backyard-v3:
       mAP50: 0.277
   notes: 'v3: balanced 4.7k images (OpenImages + Caltech), yolo11m fine-tune. +7.5
     mAP vs v2.'
+squirrel-v4-s:
+  type: finetuned
+  date: '2026-06-24'
+  path: runs/detect/runs/squirrel-v4-s-2/weights/best.pt
+  classes:
+  - squirrel
+  num_classes: 1
+  base_model: yolo11s
+  dataset: squirrel-v4 (OI+Caltech+video, 678 images)
+  num_images: 678
+  metrics:
+    mAP50: 0.859
+    mAP50-95: 0.532
+    precision: 0.83
+    recall: 0.823
+  notes: Squirrel-only detector. yolo11s distilled from x. mAP50 0.859.
