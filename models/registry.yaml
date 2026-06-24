@@ -105,3 +105,17 @@ squirrel-v4-s:
     precision: 0.83
     recall: 0.823
   notes: Squirrel-only detector. yolo11s distilled from x. mAP50 0.859.
+squirrel-v7:
+  type: finetuned
+  date: '2026-06-24'
+  path: runs/detect/runs/squirrel-v7/weights/best.pt
+  classes:
+  - squirrel
+  num_classes: 1
+  base_model: yolo11s
+  dataset: 35 hand-labeled backyard frames
+  num_images: 35
+  metrics:
+    mAP50: 0.543
+    mAP50-95: 0.144
+  notes: 'v7: trained on 35 hand-labeled frames only. Low confidence but precise.'
