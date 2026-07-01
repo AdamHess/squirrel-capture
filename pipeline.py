@@ -63,8 +63,10 @@ class SquirrelPipeline:
                 max_lost=trk.get("max_lost", 30),
                 iou_threshold=trk.get("iou_threshold", 0.3),
             )
+            self._min_track_frames = trk.get("min_track_frames", 0)
         else:
             self.tracker = None
+            self._min_track_frames = 0
 
         cap = cfg["capture"]
         self.labeler = AutoLabeler(
@@ -74,7 +76,9 @@ class SquirrelPipeline:
             save_labeled=cap.get("save_labeled", True),
             save_annotated=cap.get("save_annotated", False),
             min_confidence=cap.get("min_confidence", 0.3),
-            track_cooldown=cap.get("track_cooldown", 10),
+            track_cooldown=cap.get("track_cooldown", 60),
+            track_cooldown_high=cap.get("track_cooldown_high", 1),
+            track_confidence_threshold=cap.get("track_confidence_threshold", 0.5),
             quality=cap.get("quality", None),
         )
 
@@ -155,6 +159,9 @@ class SquirrelPipeline:
 
             if self.tracker:
                 detections = self.tracker.update(detections)
+                # Temporal consistency: require tracks seen in N+ frames
+                if self._min_track_frames > 0:
+                    detections = [d for d in detections if d.get("frames_seen", 0) >= self._min_track_frames]
 
             self.labeler.save(frame, detections)
 

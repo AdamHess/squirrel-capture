@@ -135,3 +135,152 @@ squirrel-v8:
     precision: 0.804
     recall: 0.968
   notes: 'v8: trained on all hand-labeled frames. 100% at 0.25.'
+squirrel-v9:
+  type: finetuned
+  date: '2026-06-27'
+  path: deploy/squirrel-v9.pt
+  classes:
+  - squirrel
+  num_classes: 1
+  base_model: squirrel-v8
+  num_images: 273
+  metrics:
+    mAP50: 0.802
+    mAP50-95: 0.407
+    precision: 0.836
+    recall: 0.74
+  notes: 'v9: merged 152 v8 + 121 new-angle, fine-tuned from v8. 99.8% new-angle,
+    89.5% old-angle'
+master-v1:
+  type: finetuned
+  date: '2026-06-27'
+  path: deploy/master-v1.pt
+  classes:
+  - squirrel
+  num_classes: 1
+  base_model: squirrel-v9
+  num_images: 403
+  metrics:
+    mAP50: 0.888
+    mAP50-95: 0.38
+    precision: 0.949
+    recall: 0.878
+  notes: 'master-v1: 403 hand-labeled images, 322 train/40 val/41 test, batch=24,
+    100 epochs'
+master-v2:
+  type: finetuned
+  date: '2026-06-27'
+  path: deploy/master-v2.pt
+  classes:
+  - squirrel
+  num_classes: 1
+  base_model: master-v1
+  num_images: 403
+  metrics:
+    mAP50: 0.875
+    mAP50-95: 0.633
+    precision: 0.822
+    recall: 0.843
+  notes: 'master-v2: 335 refined + 68 original labels, imgsz=960, 73 epochs'
+
+master-v3:
+  type: finetuned
+  date: '2026-06-28'
+  path: deploy/master-v3.pt
+  classes:
+  - squirrel
+  num_classes: 1
+  base_model: master-v2
+  dataset: 419 hand-labeled + 32 hard negatives, imgsz=960
+  num_images: 451
+  metrics:
+    mAP50: 0.948
+    mAP50-95: 0.676
+    precision: 1.0
+    recall: 0.862
+  notes: 'master-v3: added 16 new labels + 32 negatives (empty labels), SGD lr=0.0005, 30 epochs'
+
+teacher-l:
+  type: finetuned
+  date: '2026-06-28'
+  path: runs/detect/runs/teacher-l/weights/best.pt
+  classes:
+  - squirrel
+  num_classes: 1
+  base_model: yolo11l.pt
+  dataset: 500 hand-labeled + 32 hard negatives, imgsz=960
+  num_images: 532
+  metrics:
+    mAP50: 0.827
+    mAP50-95: 0.551
+    precision: 0.972
+    recall: 0.742
+  notes: 'teacher-l: yolo11l trained from COCO, batch=4, 39 epochs. Did NOT beat master-v3 - distillation skipped.'
+
+master-v4:
+  type: finetuned
+  date: '2026-06-28'
+  path: deploy/master-v4.pt
+  classes:
+  - squirrel
+  num_classes: 1
+  base_model: master-v3
+  dataset: 500 hand-labeled + 61 hard negatives, imgsz=960
+  num_images: 561
+  metrics:
+    mAP50: 0.922
+    mAP50-95: 0.623
+    precision: 0.979
+    recall: 0.795
+  notes: 'master-v4: +29 extra negatives. Test: 92% recall, 0 FP @0.70 vs master-v3 4 FP. Deployed.'
+
+trapper-distill-ft:
+  type: finetuned
+  date: '2026-06-28'
+  path: deploy/trapper-distill-ft.pt
+  classes:
+  - squirrel
+  num_classes: 1
+  base_model: yolov8s (distilled from trapper-v3)
+  dataset: 500 hand-labeled + 61 hard negatives, imgsz=960
+  num_images: 561
+  metrics:
+    mAP50: 0.887
+    mAP50-95: 0.569
+    precision: 0.976
+    recall: 0.831
+  notes: 'Distilled from trapper-v3 (YOLOv8-m) to YOLOv8-s, then fine-tuned. Test @0.50: 84% recall, 1 FP. Deployed.'
+
+master-v4-nv2:
+  type: finetuned
+  date: '2026-06-28'
+  path: deploy/master-v4-nv2.pt
+  classes:
+  - squirrel
+  num_classes: 1
+  base_model: master-v4
+  dataset: 500 hand-labeled + 77 hard negatives, imgsz=960
+  num_images: 577
+  metrics:
+    mAP50: 0.931
+    mAP50-95: 0.633
+    precision: 0.976
+    recall: 0.814
+  notes: 'master-v4 with +16 new negatives. Test @0.50: 88% recall, 11 FP @0.70: 84% recall, 2 FP.'
+
+scratch-v1:
+  type: finetuned
+  date: '2026-06-28'
+  path: deploy/scratch-v1.pt
+  classes:
+  - squirrel
+  num_classes: 1
+  base_model: yolo11s (from COCO)
+  dataset: 500 hand-labeled + 77 hard negatives, imgsz=960
+  num_images: 577
+  metrics:
+    mAP50: 0.951
+    mAP50-95: 0.660
+    precision: 0.960
+    recall: 0.881
+  notes: 'From scratch yolo11s. Val mAP50 0.951 (best ever). Test @0.50: 82% recall, 1 FP. Deployed.'

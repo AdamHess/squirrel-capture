@@ -72,6 +72,7 @@ class DetectionTracker:
             if best_id is not None and best_iou >= self.iou_threshold:
                 self._tracks[best_id].update(det, frame_id=0)
                 det["track_id"] = best_id
+                det["frames_seen"] = self._tracks[best_id].frames_seen
                 matched.append(det)
             else:
                 unmatched_dets.append(det)
@@ -81,6 +82,7 @@ class DetectionTracker:
             self._next_id += 1
             self._tracks[track_id] = TrackState(track_id, det)
             det["track_id"] = track_id
+            det["frames_seen"] = 1
             matched.append(det)
 
         self._prune_tracks()

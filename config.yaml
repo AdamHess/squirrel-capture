@@ -5,7 +5,7 @@ camera:
   rtsp_url: "rtsp://admin:PeriodCake2024!@192.168.1.204:554/Preview_01_main"
   reconnect_interval: 5
   timeout: 10
-  decode_every_n: 5    # decode 1 out of every N frames (1 = decode all)
+  decode_every_n: 1    # decode every frame (1 = all frames)
 
 # Motion detection
 motion:
@@ -17,12 +17,12 @@ motion:
 
 # Detection
 detection:
-  model: "nyc-backyard-v1"  # name in models/registry.yaml, or path to .pt
+  model: "deploy/master-v4-nv2.pt"  # name in models/registry.yaml, or path to .pt
   conf_threshold: 0.25
   iou_threshold: 0.45
   target_classes: [0]       # [0] = Squirrel (our class 0), [] = all
-  device: "cpu"             # "cpu", "cuda:0", etc.
-  yolo_sweep: 12            # periodic YOLO every N frames (0=off, catches stationary)
+  device: "cuda:0"           # "cpu", "cuda:0", etc.
+  yolo_sweep: 0              # 0=off (every frame processed via motion + decode_every_n)
 
 # Tracker (deduplicates labels per unique object)
 tracker:
@@ -30,16 +30,19 @@ tracker:
   method: "bytetrack"  # bytetrack or iou
   max_lost: 30         # frames before track is forgotten
   iou_threshold: 0.3
+  min_track_frames: 0  # 0=off (tracker handles temporal consistency)
 
 # Capture / auto-label
 capture:
   output_dir: "data"
   label_format: "yolo" # yolo, coco, or voc
-  save_raw: true
+  save_raw: false  # labeled/images already has the same JPEG
   save_labeled: true
   save_annotated: false  # bounding-box previews (saves ~50% disk)
-  min_confidence: 0.3  # minimum conf to auto-save label
-  track_cooldown: 3    # min seconds between saves of the same tracked object
+  min_confidence: 0.5  # minimum conf to auto-save label
+  track_cooldown: 60   # min seconds between saves (low confidence, <0.70)
+  track_cooldown_high: 1  # min seconds between saves (high confidence, >=0.70)
+  track_confidence_threshold: 0.7  # threshold for high-confidence cooldown
   quality:             # pre-save quality filters (0 = disabled)
     min_blur: 50       # skip blurry frames (Laplacian variance, lower = blurrier)
     min_box_area: 2000 # skip detections smaller than this many px

@@ -16,7 +16,9 @@ class AutoLabeler:
         save_labeled=True,
         save_annotated=False,
         min_confidence=0.3,
-        track_cooldown=10,
+        track_cooldown=60,
+        track_cooldown_high=1,
+        track_confidence_threshold=0.5,
         quality=None,
     ):
         self.output_dir = Path(output_dir)
@@ -26,6 +28,8 @@ class AutoLabeler:
         self.save_annotated = save_annotated
         self.min_confidence = min_confidence
         self.track_cooldown = track_cooldown
+        self.track_cooldown_high = track_cooldown_high
+        self.track_confidence_threshold = track_confidence_threshold
         self.quality = quality or {
             "min_blur": 50,
             "min_box_area": 2000,
@@ -48,10 +52,11 @@ class AutoLabeler:
         q = self.quality
 
         # Blur check — if the whole frame is blurry, nothing is worth saving
+        blur_var = 0.0
         if q.get("min_blur", 0) > 0:
-            var = cv2.Laplacian(frame, cv2.CV_64F).var()
-            if var < q["min_blur"]:
-                log.debug("Skipped blurry frame (Laplacian var=%.1f)", var)
+            blur_var = cv2.Laplacian(frame, cv2.CV_64F).var()
+            if blur_var < q["min_blur"]:
+                log.debug("Skipped blurry frame (Laplacian var=%.1f)", blur_var)
                 return None
 
         kept = []
@@ -71,20 +76,29 @@ class AutoLabeler:
                 log.debug("Rejected small detection (%d px)", (x2 - x1) * (y2 - y1))
                 continue
 
+            d["blur_score"] = round(blur_var, 1)
             kept.append(d)
 
         return kept if kept else None
 
     def _should_save(self, detections):
-        """Skip if every tracked detection was saved within cooldown."""
+        """Skip if every tracked detection was saved within cooldown.
+        Uses shorter cooldown for high-confidence detections."""
         now = time.time()
+        if not detections:
+            return False
+
+        # Pick cooldown based on highest confidence detection
+        max_conf = max(d.get("confidence", 0) for d in detections)
+        cooldown = self.track_cooldown_high if max_conf >= self.track_confidence_threshold else self.track_cooldown
+
         any_new = False
         for d in detections:
             tid = d.get("track_id")
             if tid is None:
                 return True  # untracked detection, always save
             last = self._last_track_save.get(tid, 0)
-            if now - last >= self.track_cooldown:
+            if now - last >= cooldown:
                 any_new = True
         return any_new
 
@@ -156,7 +170,11 @@ class AutoLabeler:
             cy = (y1 + y2) / 2 / h
             bw = (x2 - x1) / w
             bh = (y2 - y1) / h
-            lines.append(f"{d['class_id']} {cx:.6f} {cy:.6f} {bw:.6f} {bh:.6f}")
+            conf = d.get("confidence", 0)
+            inf_ms = d.get("inference_ms", 0)
+            tid = d.get("track_id", -1)
+            blur = d.get("blur_score", 0)
+            lines.append(f"{d['class_id']} {cx:.6f} {cy:.6f} {bw:.6f} {bh:.6f} {conf:.4f} {inf_ms:.1f} {tid} {blur:.1f}")
 
         label_path = self.labeled_dir / "labels" / f"{filename}.txt"
         label_path.write_text("\n".join(lines))

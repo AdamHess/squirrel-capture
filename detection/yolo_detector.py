@@ -32,6 +32,8 @@ class YOLODetector:
         log.info("Model loaded")
 
     def detect(self, frame):
+        import time
+        t0 = time.time()
         results = self.model(
             frame,
             conf=self.conf_threshold,
@@ -39,6 +41,7 @@ class YOLODetector:
             device=self.device,
             verbose=False,
         )[0]
+        inference_ms = (time.time() - t0) * 1000
 
         detections = []
         if results.boxes is None:
@@ -60,6 +63,7 @@ class YOLODetector:
                     "class_id": cls_id,
                     "class_name": results.names[cls_id],
                     "confidence": conf,
+                    "inference_ms": round(inference_ms, 1),
                 }
             )
 

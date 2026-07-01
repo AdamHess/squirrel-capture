@@ -1,0 +1,16 @@
+[Unit]
+Description=Squirrel Video Watcher — runs YOLO inference on new FTP videos
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/opt/squirrel-video-watcher
+Environment=PYTHONUNBUFFERED=1
+ExecStart=/opt/squirrel-video-watcher/venv/bin/python /opt/squirrel-video-watcher/video_watcher.py
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
