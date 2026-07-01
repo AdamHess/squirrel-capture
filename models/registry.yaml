@@ -182,7 +182,6 @@ master-v2:
     precision: 0.822
     recall: 0.843
   notes: 'master-v2: 335 refined + 68 original labels, imgsz=960, 73 epochs'
-
 master-v3:
   type: finetuned
   date: '2026-06-28'
@@ -198,8 +197,8 @@ master-v3:
     mAP50-95: 0.676
     precision: 1.0
     recall: 0.862
-  notes: 'master-v3: added 16 new labels + 32 negatives (empty labels), SGD lr=0.0005, 30 epochs'
-
+  notes: 'master-v3: added 16 new labels + 32 negatives (empty labels), SGD lr=0.0005,
+    30 epochs'
 teacher-l:
   type: finetuned
   date: '2026-06-28'
@@ -215,8 +214,8 @@ teacher-l:
     mAP50-95: 0.551
     precision: 0.972
     recall: 0.742
-  notes: 'teacher-l: yolo11l trained from COCO, batch=4, 39 epochs. Did NOT beat master-v3 - distillation skipped.'
-
+  notes: 'teacher-l: yolo11l trained from COCO, batch=4, 39 epochs. Did NOT beat master-v3
+    - distillation skipped.'
 master-v4:
   type: finetuned
   date: '2026-06-28'
@@ -232,8 +231,8 @@ master-v4:
     mAP50-95: 0.623
     precision: 0.979
     recall: 0.795
-  notes: 'master-v4: +29 extra negatives. Test: 92% recall, 0 FP @0.70 vs master-v3 4 FP. Deployed.'
-
+  notes: 'master-v4: +29 extra negatives. Test: 92% recall, 0 FP @0.70 vs master-v3
+    4 FP. Deployed.'
 trapper-distill-ft:
   type: finetuned
   date: '2026-06-28'
@@ -249,8 +248,8 @@ trapper-distill-ft:
     mAP50-95: 0.569
     precision: 0.976
     recall: 0.831
-  notes: 'Distilled from trapper-v3 (YOLOv8-m) to YOLOv8-s, then fine-tuned. Test @0.50: 84% recall, 1 FP. Deployed.'
-
+  notes: 'Distilled from trapper-v3 (YOLOv8-m) to YOLOv8-s, then fine-tuned. Test
+    @0.50: 84% recall, 1 FP. Deployed.'
 master-v4-nv2:
   type: finetuned
   date: '2026-06-28'
@@ -266,8 +265,8 @@ master-v4-nv2:
     mAP50-95: 0.633
     precision: 0.976
     recall: 0.814
-  notes: 'master-v4 with +16 new negatives. Test @0.50: 88% recall, 11 FP @0.70: 84% recall, 2 FP.'
-
+  notes: 'master-v4 with +16 new negatives. Test @0.50: 88% recall, 11 FP @0.70: 84%
+    recall, 2 FP.'
 scratch-v1:
   type: finetuned
   date: '2026-06-28'
@@ -280,7 +279,24 @@ scratch-v1:
   num_images: 577
   metrics:
     mAP50: 0.951
-    mAP50-95: 0.660
-    precision: 0.960
+    mAP50-95: 0.66
+    precision: 0.96
     recall: 0.881
-  notes: 'From scratch yolo11s. Val mAP50 0.951 (best ever). Test @0.50: 82% recall, 1 FP. Deployed.'
+  notes: 'From scratch yolo11s. Val mAP50 0.951 (best ever). Test @0.50: 82% recall,
+    1 FP. Deployed.'
+yolo12s-v1:
+  type:
+    mAP50: 0.959
+    mAP50-95: 0.616
+    precision: 0.966
+    recall: 0.894
+  date: '2026-07-01'
+  path: deploy/yolo12s-v1.pt
+  classes: []
+  num_classes: 0
+  base_model:
+    type: finetuned
+    base_model: yolo12s.pt
+    dataset: D:/squirrel_training/training_data/data.yaml
+    num_images: 1424
+    notes: batch=8, imgsz=800, epochs=100, cache, workers=0
